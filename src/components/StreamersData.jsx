@@ -2,21 +2,16 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
-import TableContainer from "@mui/material/TableContainer";
-import Table from "@mui/material/Table";
-import TableHead from "@mui/material/TableHead";
-import TableBody from "@mui/material/TableBody";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
-import TableSortLabel from "@mui/material/TableSortLabel";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import GetAppIcon from "@mui/icons-material/GetApp";
-import InfoIcon from '@mui/icons-material/Info';
-import Tooltip from '@mui/material/Tooltip';
+import InfoIcon from "@mui/icons-material/Info";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import Tooltip from "@mui/material/Tooltip";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import TableStreamersComponent from "./TableStreamersComponent";
 
 function StreamersData() {
   const [streamers, setStreamers] = useState([]);
@@ -24,19 +19,21 @@ function StreamersData() {
   const [order, setOrder] = useState("asc");
   const [searchTerm, setSearchTerm] = useState("");
   const [openAlert, setOpenAlert] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState(null);
 
   useEffect(() => {
-    async function fetchStreamers() {
-      try {
-        const response = await axios.get("http://localhost:5500/streamers");
-        setStreamers(response.data);
-      } catch (error) {
-        console.error("Error fetching streamers:", error);
-      }
-    }
-
     fetchStreamers();
   }, []);
+
+  const fetchStreamers = async () => {
+    try {
+      const response = await axios.get("http://localhost:5500/streamers");
+      setStreamers(response.data);
+      setLastRefreshed(new Date().toLocaleString());
+    } catch (error) {
+      console.error("Error fetching streamers:", error);
+    }
+  };
 
   const handleRequestSort = (property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -52,20 +49,30 @@ function StreamersData() {
     setSearchTerm(event.target.value);
   };
 
+  const handleRefresh = async () => {
+    try {
+      await axios.post("http://localhost:5500/streamers", {}); // Envía una solicitud POST para actualizar los datos
+      fetchStreamers();
+      console.log("Refresh successfull");
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    }
+  };
+
   const getFilteredAndSortedStreamers = () => {
     return streamers
-      .filter(streamer =>
+      .filter((streamer) =>
         streamer.username.toLowerCase().includes(searchTerm.toLowerCase())
       )
       .sort((a, b) => {
-        if (orderBy === 'username') {
-          return order === 'asc'
+        if (orderBy === "username") {
+          return order === "asc"
             ? a.username.localeCompare(b.username)
             : b.username.localeCompare(a.username);
         } else {
-          const numA = parseFloat(a[orderBy].replace(/,/g, ''));
-          const numB = parseFloat(b[orderBy].replace(/,/g, ''));
-          return order === 'asc' ? numA - numB : numB - numA;
+          const numA = parseFloat(a[orderBy].replace(/,/g, ""));
+          const numB = parseFloat(b[orderBy].replace(/,/g, ""));
+          return order === "asc" ? numA - numB : numB - numA;
         }
       });
   };
@@ -151,71 +158,27 @@ function StreamersData() {
                 <InfoIcon fontSize="small" />
               </IconButton>
             </Tooltip>
+            <Tooltip title="Refresh Data">
+              <IconButton aria-label="refresh" onClick={handleRefresh}>
+                <RefreshIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            {lastRefreshed && (
+              <span style={{ marginLeft: "10px" }}>
+                Última actualización: {lastRefreshed}
+              </span>
+            )}
           </Box>
-          <TableContainer>
-            <Table
-              sx={{ minWidth: 750 }}
-              aria-labelledby="tableTitle"
-              size="medium"
-            >
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === "username"}
-                      direction={orderBy === "username" ? order : "asc"}
-                      onClick={() => handleRequestSort("username")}
-                    >
-                      Username
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === "averageViewers"}
-                      direction={orderBy === "averageViewers" ? order : "asc"}
-                      onClick={() => handleRequestSort("averageViewers")}
-                    >
-                      Average Viewers
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === "peakViewers"}
-                      direction={orderBy === "peakViewers" ? order : "asc"}
-                      onClick={() => handleRequestSort("peakViewers")}
-                    >
-                      Peak Viewers
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>
-                    <TableSortLabel
-                      active={orderBy === "hoursWatched"}
-                      direction={orderBy === "hoursWatched" ? order : "asc"}
-                      onClick={() => handleRequestSort("hoursWatched")}
-                    >
-                      Hours Watched
-                    </TableSortLabel>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-              {getFilteredAndSortedStreamers().map((streamer) => (
-                  <TableRow key={streamer._id}>
-                    <TableCell>{streamer.username}</TableCell>
-                    <TableCell>
-                      {formatNumberWithCommas(streamer.averageViewers)}
-                    </TableCell>
-                    <TableCell>
-                      {formatNumberWithCommas(streamer.peakViewers)}
-                    </TableCell>
-                    <TableCell>
-                      {formatNumberWithCommas(streamer.hoursWatched)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <TableStreamersComponent
+            streamers={streamers}
+            orderBy={orderBy}
+            order={order}
+            searchTerm={searchTerm}
+            handleRequestSort={handleRequestSort}
+            downloadCSV={downloadCSV}
+            formatNumberWithCommas={formatNumberWithCommas}
+            getFilteredAndSortedStreamers={getFilteredAndSortedStreamers}
+          />
         </Paper>
       </Box>
       <Snackbar
