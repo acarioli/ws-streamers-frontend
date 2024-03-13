@@ -20,8 +20,8 @@ function TableStreamersComponent({
   const filteredAndSortedStreamers = getFilteredAndSortedStreamers();
   return (
     <>
-      <div className="px-4 bg-gray-200 border-gray-500 text-gray-600">
-        Your free instance will spin down with inactivity, which can delay requests by 50 seconds or more. Upgrade now.
+      <div className="px-2 bg-gray-200 border-gray-500 text-gray-600">
+        This process can take up to 50 seconds. Please wait...
       </div>
       <TableContainer>
         <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size="medium">
