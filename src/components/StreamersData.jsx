@@ -27,7 +27,7 @@ function StreamersData() {
 
   const fetchStreamers = async () => {
     try {
-      const response = await axios.get("http://localhost:5500/streamers");
+      const response = await axios.get("https://ws-streamers-backend.onrender.com/streamers");
       setStreamers(response.data);
       setLastRefreshed(new Date().toLocaleString());
     } catch (error) {
@@ -51,8 +51,7 @@ function StreamersData() {
 
   const handleRefresh = async () => {
     try {
-      await axios.post("http://localhost:5500/streamers", {}); // Envía una solicitud POST para actualizar los datos
-      fetchStreamers();
+      await axios.post("https://ws-streamers-backend.onrender.com/streamers", {}); 
       console.log("Refresh successfull");
     } catch (error) {
       console.error("Error refreshing data:", error);
@@ -80,7 +79,7 @@ function StreamersData() {
   const downloadCSV = async () => {
     try {
       // Obtener los datos de los streamers en formato JSON
-      const response = await axios.get("http://localhost:5500/streamers");
+      const response = await axios.get("https://ws-streamers-backend.onrender.com/streamers");
 
       // Convertir los datos JSON en formato CSV
       const streamersData = response.data;
