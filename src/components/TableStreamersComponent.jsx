@@ -19,66 +19,70 @@ function TableStreamersComponent({
 }) {
   const filteredAndSortedStreamers = getFilteredAndSortedStreamers();
   return (
-    <TableContainer>
-      <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size="medium">
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <TableSortLabel
-                active={orderBy === "username"}
-                direction={orderBy === "username" ? order : "asc"}
-                onClick={() => handleRequestSort("username")}
-              >
-                Username
-              </TableSortLabel>
-            </TableCell>
-            <TableCell>
-              <TableSortLabel
-                active={orderBy === "averageViewers"}
-                direction={orderBy === "averageViewers" ? order : "asc"}
-                onClick={() => handleRequestSort("averageViewers")}
-              >
-                Average Viewers
-              </TableSortLabel>
-            </TableCell>
-            <TableCell>
-              <TableSortLabel
-                active={orderBy === "peakViewers"}
-                direction={orderBy === "peakViewers" ? order : "asc"}
-                onClick={() => handleRequestSort("peakViewers")}
-              >
-                Peak Viewers
-              </TableSortLabel>
-            </TableCell>
-            <TableCell>
-              <TableSortLabel
-                active={orderBy === "hoursWatched"}
-                direction={orderBy === "hoursWatched" ? order : "asc"}
-                onClick={() => handleRequestSort("hoursWatched")}
-              >
-                Hours Watched
-              </TableSortLabel>
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {filteredAndSortedStreamers.map((streamer) => (
-            <TableRow key={streamer._id}>
-              <TableCell>{streamer.username}</TableCell>
+    <>
+      <div className="px-4 bg-gray-200 border-gray-500 text-gray-600">
+        Your free instance will spin down with inactivity, which can delay requests by 50 seconds or more. Upgrade now.
+      </div>
+      <TableContainer>
+        <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size="medium">
+          <TableHead>
+            <TableRow>
               <TableCell>
-                {formatNumberWithCommas(streamer.averageViewers)}
+                <TableSortLabel
+                  active={orderBy === "username"}
+                  direction={orderBy === "username" ? order : "asc"}
+                  onClick={() => handleRequestSort("username")}
+                >
+                  Username
+                </TableSortLabel>
               </TableCell>
               <TableCell>
-                {formatNumberWithCommas(streamer.peakViewers)}
+                <TableSortLabel
+                  active={orderBy === "averageViewers"}
+                  direction={orderBy === "averageViewers" ? order : "asc"}
+                  onClick={() => handleRequestSort("averageViewers")}
+                >
+                  Average Viewers
+                </TableSortLabel>
               </TableCell>
               <TableCell>
-                {formatNumberWithCommas(streamer.hoursWatched)}
+                <TableSortLabel
+                  active={orderBy === "peakViewers"}
+                  direction={orderBy === "peakViewers" ? order : "asc"}
+                  onClick={() => handleRequestSort("peakViewers")}
+                >
+                  Peak Viewers
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={orderBy === "hoursWatched"}
+                  direction={orderBy === "hoursWatched" ? order : "asc"}
+                  onClick={() => handleRequestSort("hoursWatched")}
+                >
+                  Hours Watched
+                </TableSortLabel>
               </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {filteredAndSortedStreamers.map((streamer) => (
+              <TableRow key={streamer._id}>
+                <TableCell>{streamer.username}</TableCell>
+                <TableCell>
+                  {formatNumberWithCommas(streamer.averageViewers)}
+                </TableCell>
+                <TableCell>
+                  {formatNumberWithCommas(streamer.peakViewers)}
+                </TableCell>
+                <TableCell>
+                  {formatNumberWithCommas(streamer.hoursWatched)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer></>
   );
 }
 
